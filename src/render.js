@@ -12,7 +12,12 @@ function createElement(template) {
   return newElement.firstElementChild;
 }
 
-function render(component, container, place = RenderPosition.BEFOREEND) {
+function render(component, container, place = '') {
+  if (place === ''){
+    place = RenderPosition.BEFOREEND;
+  } else {
+    place = RenderPosition[place];
+  }
   container.insertAdjacentElement(place, component.getElement());
 }
 
