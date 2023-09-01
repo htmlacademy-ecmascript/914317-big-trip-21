@@ -1,5 +1,3 @@
-import { createElement } from '../render.js';
-
 function addNewPoint(){
   return `<form class="event event--edit" action="#" method="post">
               <header class="event__header">
@@ -164,21 +162,5 @@ function addNewPoint(){
   `;
 }
 
-export default class AddNewPoint {
+export { addNewPoint };
 
-  getTemplate(){
-    return addNewPoint();
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
-  }
-}
