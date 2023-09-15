@@ -1,22 +1,27 @@
-import { createElement } from '../../render.js';
+import AbstractView from '../../framework/view/abstract-view.js';
 import { editPoint } from '../../components/view/edit-point.js';
 
 
-export default class EditPoint {
+export default class EditPoint extends AbstractView {
 
-  getTemplate(){
+  #handlerRollUpClick = null;
+
+  constructor({ onRollUpClick }) {
+    super();
+    this.#handlerRollUpClick = onRollUpClick;
+
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editRollUpHandler);
+    this.element.querySelector('.event__save-btn').addEventListener('click', this.#editRollUpHandler);
+
+  }
+
+  #editRollUpHandler = (evt) =>{
+    evt.preventDefault();
+    this.#handlerRollUpClick();
+  };
+
+  get template() {
     return editPoint();
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
-  }
 }
