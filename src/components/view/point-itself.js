@@ -1,8 +1,7 @@
 import {formatDate,formatDuration} from '../../util.js';
 
-function createPointItself(pointModel) {
+function createPointItself({pointType, destination, price, offers, startTime, endTime}) {
 
-  const { pointType, destination, price, offers, startTime, endTime } = pointModel;
   const offersMarkup = createOffers(offers);
 
   const destinationName = destination.name;

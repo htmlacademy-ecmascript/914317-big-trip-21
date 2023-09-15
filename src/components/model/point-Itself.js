@@ -1,25 +1,26 @@
-import { createElement } from '../../render.js';
+import AbstractView from '../../framework/view/abstract-view.js';
 import { createPointItself } from '../../components/view/point-itself.js';
 
-export default class PointItself {
+export default class PointItself extends AbstractView {
 
-  constructor(pointModel){
-    this.pointModel = pointModel;
+  #pointModel = null;
+  #handleRollDownClick = null;
+
+  constructor({pointModel,onRollDownClick}){
+    super();
+    this.#pointModel = pointModel;
+    this.#handleRollDownClick = onRollDownClick;
+
+    this.element.querySelector('.event__rollup-btn').addEventListener('click',this.#editRollDownHandler);
   }
 
-  getTemplate(){
-    return createPointItself(this.pointModel);
+  #editRollDownHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleRollDownClick();
+  };
+
+  get template(){
+    return createPointItself(this.#pointModel);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
-  }
 }
