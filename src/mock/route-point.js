@@ -1,4 +1,4 @@
-import { getRandomArrayElement } from '../util.js';
+import { getRandomArrayElement } from '../../src/utils/util.js';
 
 const destinationDescription = [
   {
@@ -78,8 +78,8 @@ const routePoint = [
   {
     pointType: 'Taxi',
     destination: getRandomArrayElement(destinationDescription),
-    startTime: new Date(2023,8,23,12,0,0),
-    endTime: new Date(2023,8,23,12,30,0),
+    startTime: new Date(2023,7,23,12,0,0),
+    endTime: new Date(2023,7,23,12,31,0),
     price: '500',
     offers: getRandomArrayElement(offerDescription),
   },

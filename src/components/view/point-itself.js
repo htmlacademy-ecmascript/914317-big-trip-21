@@ -1,4 +1,4 @@
-import {formatDate,formatDuration} from '../../util.js';
+import {formatDate,formatDuration} from '../../utils/util.js';
 
 function createPointItself({pointType, destination, price, offers, startTime, endTime}) {
 

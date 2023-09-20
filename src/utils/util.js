@@ -8,6 +8,18 @@ function formatDate(neededDate, formatString) {
   return dayjs(neededDate).format(formatString);
 }
 
+function isDatePast(dateForCheck){
+  return dayjs().isAfter(dayjs(dateForCheck));
+}
+
+function isDateFuture(dateForCheck){
+  return dayjs().isBefore(dayjs(dateForCheck));
+}
+
+function isDatePresent(dateForCheck){
+  return dayjs().isSame(dayjs(dateForCheck),'day');
+}
+
 function formatDuration(eventStartTime, eventEndTime) {
 
   const diffMinute = differenceDate(eventStartTime, eventEndTime, 'minute');
@@ -52,4 +64,4 @@ function differenceDate(startTime, endTime, measure) {
 }
 
 
-export { getRandomArrayElement, formatDate, formatDuration };
+export { getRandomArrayElement, formatDate, formatDuration, isDatePast, isDateFuture, isDatePresent };
