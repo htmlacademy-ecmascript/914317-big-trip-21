@@ -63,5 +63,9 @@ function differenceDate(startTime, endTime, measure) {
   return endTimeFormatted.diff(startTimeFormatted, measure);
 }
 
+function updateItem(items, updatedItem){
+  return items.map((item) => item.id === updatedItem.id ? updatedItem : item);
+}
 
-export { getRandomArrayElement, formatDate, formatDuration, isDatePast, isDateFuture, isDatePresent };
+
+export { getRandomArrayElement, formatDate, formatDuration, isDatePast, isDateFuture, isDatePresent, updateItem };
