@@ -1,12 +1,11 @@
-import { render, replace, remove } from '../src/framework/render.js';
+import { render, remove } from '../src/framework/render.js';
+import { updateItem } from '../src/utils/util.js';
 import { generateFilter } from '../src/mock/filter.js';
 import Filters from '../src/components/model/filter.js';
 import Sort from '../src/components/model/sort.js';
-// import AddNewPoint from '../src/components/model/add-new-point.js';
-import EditPoint from '../src/components/model/edit-point.js';
 import UList from '../src/components/model/add-list.js';
 import FilterForm from '../src/components/model/fiter-form.js';
-import PointItself from '../src/components/model/point-Itself.js';
+import PointPresenter from '../page/point-presenter.js';
 
 export default class PagePresenter {
   #routePointModel = null;
@@ -21,6 +20,8 @@ export default class PagePresenter {
   #filterFormComponent = new FilterForm();
   #sortComponent = new Sort();
   #ulLstComponent = null;
+
+  #pointsPresenters = new Map();
 
   constructor({ pointModel, controlsFilters, tripEvents }) {
     this.#routePointModel = pointModel;
@@ -57,6 +58,15 @@ export default class PagePresenter {
 
   }
 
+  #handlePointClick = (updatedPoint) => {
+    this.#pointModels = updateItem(this.#pointModels,updatedPoint);
+    this.#pointsPresenters.get(updatedPoint.id).renderPoint(updatedPoint);
+  };
+
+  #handleModeChange = () => {
+    this.#pointsPresenters.forEach((pointPresenter) => pointPresenter.resetView());
+  };
+
   /*рендер обертки-формы фильтров
  */
   #renderFilterForm() {
@@ -71,7 +81,7 @@ export default class PagePresenter {
       remove(this.#ulLstComponent);
       this.#renderUlList();
       for (let i = 0; i < filtredModelElement.points.length; i++) {
-        this.#renderPoint(filtredModelElement.points[i], this.#ulLstComponent.element);
+        this.#renderPoint(filtredModelElement.points[i]);
       }
     };
 
@@ -99,40 +109,22 @@ export default class PagePresenter {
 
   /*отрисовка точки маршрута
   */
-  #renderPoint(point, uList) {
+  #renderPoint(point) {
 
-    const escKeyDownHandler = (evt) => {
-      if (evt.key === 'Escape') {
-        evt.preventDefault();
-        replaceEditToPoint();
-        document.removeEventListener('keydown', escKeyDownHandler);
+    const pointPresenter = new PointPresenter(
+      {ulLstComponentElement: this.#ulLstComponent.element,
+        onDataChange: this.#handlePointClick,
+        onModeChange: this.#handleModeChange
       }
-    };
+    );
+    pointPresenter.renderPoint(point);
 
-    const pointComponent = new PointItself({
-      pointModel: point,
-      onRollDownClick: () => {
-        replacePointToEdit();
-        document.addEventListener('keydown', escKeyDownHandler);
-      }
-    });
+    this.#pointsPresenters.set(point.id,pointPresenter);
+  }
 
-    const pointEditComponent = new EditPoint({
-      onRollUpClick: () => {
-        replaceEditToPoint();
-        document.removeEventListener('keydown', escKeyDownHandler);
-      }
-    });
-
-    function replacePointToEdit() {
-      replace(pointEditComponent, pointComponent);
-    }
-
-    function replaceEditToPoint() {
-      replace(pointComponent, pointEditComponent);
-    }
-
-    render(pointComponent, uList);
+  #clearPointList(){
+    this.#pointsPresenters.forEach((pointPresenter) => pointPresenter.destroy());
+    this.#pointsPresenters.clear();
   }
 
 }

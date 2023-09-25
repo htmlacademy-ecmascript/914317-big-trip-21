@@ -1,4 +1,5 @@
 import { getRandomArrayElement } from '../../src/utils/util.js';
+import { nanoid } from 'nanoid';
 
 const destinationDescription = [
   {
@@ -81,6 +82,7 @@ const routePoint = [
     startTime: new Date(2023,7,23,12,0,0),
     endTime: new Date(2023,7,23,12,31,0),
     price: '500',
+    isFavourite: true,
     offers: getRandomArrayElement(offerDescription),
   },
 
@@ -90,6 +92,7 @@ const routePoint = [
     startTime: new Date(2023,8,25,16,0,0),
     endTime: new Date(2023,8,27,17,36,0),
     price: '600',
+    isFavourite: true,
     offers: getRandomArrayElement(offerDescription),
   },
 
@@ -99,6 +102,7 @@ const routePoint = [
     startTime: new Date(2023,8,26,10,57,0),
     endTime: new Date(2023,8,26,16,45,0),
     price: '1000',
+    isFavourite: true,
     offers: getRandomArrayElement(offerDescription),
   },
 
@@ -108,13 +112,16 @@ const routePoint = [
     startTime: new Date(2023,8,27,10,0,0),
     endTime: new Date(2023,8,27,10,10,0),
     price: '10',
+    isFavourite: true,
     offers: getRandomArrayElement(offerDescription),
   },
 
 ];
 
 function getRandomRoutePoint(){
-  return getRandomArrayElement(routePoint);
+  return {id: nanoid(),
+    ...getRandomArrayElement(routePoint)
+  };
 }
 
 export { getRandomRoutePoint };
