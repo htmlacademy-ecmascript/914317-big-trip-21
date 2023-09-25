@@ -6,11 +6,9 @@ const FilterType = {
 };
 
 const SortType = {
-  Day : 'day',
-  Event : 'event',
-  Time : 'time',
-  Price : 'price',
-  Offer : 'offer'
+  DAY : 'day',
+  TIME : 'time',
+  PRICE : 'price',
 };
 
 export {FilterType, SortType};

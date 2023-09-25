@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 
-function getRandomArrayElement(items){
+function getRandomArrayElement(items) {
   return items[Math.floor(Math.random() * items.length)];
 }
 
@@ -8,16 +8,16 @@ function formatDate(neededDate, formatString) {
   return dayjs(neededDate).format(formatString);
 }
 
-function isDatePast(dateForCheck){
+function isDatePast(dateForCheck) {
   return dayjs().isAfter(dayjs(dateForCheck));
 }
 
-function isDateFuture(dateForCheck){
+function isDateFuture(dateForCheck) {
   return dayjs().isBefore(dayjs(dateForCheck));
 }
 
-function isDatePresent(dateForCheck){
-  return dayjs().isSame(dayjs(dateForCheck),'day');
+function isDatePresent(dateForCheck) {
+  return dayjs().isSame(dayjs(dateForCheck), 'day');
 }
 
 function formatDuration(eventStartTime, eventEndTime) {
@@ -63,9 +63,36 @@ function differenceDate(startTime, endTime, measure) {
   return endTimeFormatted.diff(startTimeFormatted, measure);
 }
 
-function updateItem(items, updatedItem){
+function updateItem(items, updatedItem) {
   return items.map((item) => item.id === updatedItem.id ? updatedItem : item);
 }
 
 
-export { getRandomArrayElement, formatDate, formatDuration, isDatePast, isDateFuture, isDatePresent, updateItem };
+function sortDay(pointA, pointB) {
+
+  return dayjs(pointA.startTime).diff(dayjs(pointB.startTime), 'day');
+}
+
+function sortTime(pointA, pointB) {
+
+  return dayjs(pointB.startTime).diff(dayjs(pointA.startTime), 'hour');
+}
+
+function compareNumeric(a, b) {
+  if (a > b) {
+    return 1;
+  }
+  if (a === b) {
+    return 0;
+  }
+  if (a < b) {
+    return -1;
+  }
+}
+
+function sortPrice(pointA, pointB) {
+
+  return compareNumeric(pointA.price, pointB.price);
+}
+
+export { sortDay, sortTime, sortPrice, getRandomArrayElement, formatDate, formatDuration, isDatePast, isDateFuture, isDatePresent, updateItem };

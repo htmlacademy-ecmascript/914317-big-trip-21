@@ -1,6 +1,7 @@
 import { render, remove } from '../src/framework/render.js';
-import { updateItem } from '../src/utils/util.js';
+import { updateItem, sortDay, sortTime, sortPrice } from '../src/utils/util.js';
 import { generateFilter } from '../src/mock/filter.js';
+import { SortType } from '../src/const.js';
 import Filters from '../src/components/model/filter.js';
 import Sort from '../src/components/model/sort.js';
 import UList from '../src/components/model/add-list.js';
@@ -18,10 +19,13 @@ export default class PagePresenter {
 
   #filterComponent = null;
   #filterFormComponent = new FilterForm();
-  #sortComponent = new Sort();
+  #sortComponent = null;
   #ulLstComponent = null;
 
   #pointsPresenters = new Map();
+
+  #currentSortType = SortType.DAY;
+  #sourcedPointModels = [];
 
   constructor({ pointModel, controlsFilters, tripEvents }) {
     this.#routePointModel = pointModel;
@@ -33,6 +37,8 @@ export default class PagePresenter {
 
     //1. получаем модель данных
     this.#pointModels = [...this.#routePointModel.getRoutePoints()];
+
+    this.#sourcedPointModels = [...this.#pointModels];
 
     //1.1 получаем массив объектов "название фильтра - массив отфильтрованных точек маршрута"
     this.#filtredModel = generateFilter(this.#pointModels);
@@ -52,19 +58,55 @@ export default class PagePresenter {
     this.#renderUlList();
 
     //5. рендерим элементы списка
-    for (let i = 0; i < this.#pointModels.length; i++) {
-      this.#renderPoint(this.#pointModels[i], this.#ulLstComponent.element);
-    }
+    this.#renderPoints();
 
   }
 
+  #renderPoints(){
+    for (let i = 0; i < this.#pointModels.length; i++) {
+      this.#renderPoint(this.#pointModels[i], this.#ulLstComponent.element);
+    }
+  }
+
+  #sortPoints(sortType) {
+
+    switch (sortType) {
+      case SortType.DAY:
+        this.#pointModels.sort(sortDay);
+        break;
+      case SortType.TIME:
+        this.#pointModels.sort(sortTime);
+        break;
+      case SortType.PRICE:
+        this.#pointModels.sort(sortPrice);
+        break;
+      default:
+        this.#pointModels = [...this.#sourcedPointModels];
+    }
+
+    this.#currentSortType = sortType;
+  }
+
   #handlePointClick = (updatedPoint) => {
-    this.#pointModels = updateItem(this.#pointModels,updatedPoint);
+    this.#pointModels = updateItem(this.#pointModels, updatedPoint);
+    this.#sourcedPointModels = updateItem(this.#sourcedPointModels, updatedPoint);
     this.#pointsPresenters.get(updatedPoint.id).renderPoint(updatedPoint);
   };
 
   #handleModeChange = () => {
     this.#pointsPresenters.forEach((pointPresenter) => pointPresenter.resetView());
+  };
+
+  #handleSortTypeChange = (sortType) => {
+
+    if (this.#currentSortType === sortType) {
+      return;
+    }
+
+    this.#sortPoints(sortType);
+    this.#clearPointList();
+    this.#renderPoints();
+
   };
 
   /*рендер обертки-формы фильтров
@@ -97,6 +139,9 @@ export default class PagePresenter {
   /*рендер сортировки
  */
   #renderSort() {
+    this.#sortComponent = new Sort({
+      onSortTypeChange: this.#handleSortTypeChange
+    });
     render(this.#sortComponent, this.#tripEvents);
   }
 
@@ -112,17 +157,18 @@ export default class PagePresenter {
   #renderPoint(point) {
 
     const pointPresenter = new PointPresenter(
-      {ulLstComponentElement: this.#ulLstComponent.element,
+      {
+        ulLstComponentElement: this.#ulLstComponent.element,
         onDataChange: this.#handlePointClick,
         onModeChange: this.#handleModeChange
       }
     );
     pointPresenter.renderPoint(point);
 
-    this.#pointsPresenters.set(point.id,pointPresenter);
+    this.#pointsPresenters.set(point.id, pointPresenter);
   }
 
-  #clearPointList(){
+  #clearPointList() {
     this.#pointsPresenters.forEach((pointPresenter) => pointPresenter.destroy());
     this.#pointsPresenters.clear();
   }
