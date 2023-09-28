@@ -1,8 +1,8 @@
 import {formatDate,formatDuration} from '../../utils/util.js';
 
-function createPointItself({pointType, destination, price, offers, startTime, endTime, isFavourite}) {
+function createPointItself({eventType, destination, price, offers, startTime, endTime, isFavourite}) {
 
-  const offersMarkup = createOffers(offers);
+  const offersMarkup = createOffers(offers.get(eventType));
 
   const destinationName = destination.name;
 
@@ -21,9 +21,9 @@ function createPointItself({pointType, destination, price, offers, startTime, en
             <div class="event">
               <time class="event__date" datetime="${eventDateMarkup}}">${eventDate}</time>
               <div class="event__type">
-                <img class="event__type-icon" width="42" height="42" src="img/icons/taxi.png" alt="Event type icon">
+                <img class="event__type-icon" width="42" height="42" src="img/icons/${eventType}.png" alt="Event type icon">
               </div>
-              <h3 class="event__title">${pointType} ${destinationName}</h3>
+              <h3 class="event__title">${eventType} ${destinationName}</h3>
               <div class="event__schedule">
                 <p class="event__time">
                   <time class="event__start-time" datetime="${eventStartTimeMarkup}">${eventStartTime}</time>
