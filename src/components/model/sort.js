@@ -17,8 +17,6 @@ export default class Sort extends AbstractView {
     if (evt.target.tagName !== 'INPUT'){
       return;
     }
-
-    //evt.preventDefault();
     this.#handleSortTypeChange(evt.target.dataset.sortType);
 
   };
