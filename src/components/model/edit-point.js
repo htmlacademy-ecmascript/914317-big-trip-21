@@ -19,9 +19,16 @@ export default class EditPoint extends AbstractStatefulView {
 
     this._setState(EditPoint.parsePointToState(pointModel));
 
+    this.element.querySelector('.event__input--price').addEventListener('input',this.#handleInput);
+
     this._restoreHandlers();
 
   }
+
+  #handleInput = (evt) => {
+    evt.preventDefault();
+    evt.target.value = evt.target.value.replace(/[^0-9, ]/g,'');
+  };
 
   removeElement() {
     super.removeElement();

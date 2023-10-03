@@ -1,4 +1,5 @@
 import {formatDate} from '../../utils/util.js';
+import he from 'he';
 
 function editPoint({eventType,destination,price,startTime,endTime,offers}){
 
@@ -95,7 +96,7 @@ function editPoint({eventType,destination,price,startTime,endTime,offers}){
                   <span class="visually-hidden">Price</span>
                   &euro;
                 </label>
-                <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
+                <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${he.encode(price)}">
               </div>
 
               <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>

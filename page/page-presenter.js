@@ -1,19 +1,17 @@
 import { render, remove } from '../src/framework/render.js';
-import { updateItem, sortDay, sortTime, sortPrice } from '../src/utils/util.js';
-import { generateFilter } from '../src/mock/filter.js';
-import { SortType } from '../src/const.js';
-import Filters from '../src/components/model/filter.js';
+import { sortDay, sortTime, sortPrice } from '../src/utils/util.js';
+import { SortType, FilterType, UserAction, UpdateType } from '../src/const.js';
 import Sort from '../src/components/model/sort.js';
 import UList from '../src/components/model/add-list.js';
-import FilterForm from '../src/components/model/fiter-form.js';
 import PointPresenter from '../page/point-presenter.js';
+import AddPointPresenter from '../page/add-point-presenter.js';
+import {filter} from '../src/utils/filter.js';
 
 export default class PagePresenter {
 
   //модели данных
   #routePointModel = null;
-  #pointModels = null;
-  #filtredModel = null;
+  #filterModel = null;
 
   //родители для компонентов
   #tripEvents = null;
@@ -21,59 +19,113 @@ export default class PagePresenter {
 
   //компоненты
   #filterComponent = null;
-  #filterFormComponent = new FilterForm();
   #sortComponent = null;
   #ulLstComponent = null;
 
   //презентеры
   #pointsPresenters = new Map();
+  #AddPointPresenter = null;
 
   //служебное
   #currentSortType = SortType.DAY;
-  #sourcedPointModels = [];
+  #onNewEventClose = null;
 
-  constructor({ pointModel, controlsFilters, tripEvents }) {
+  constructor({ pointModel, controlsFilters, tripEvents, filterModel,onNewEventClose }) {
     this.#routePointModel = pointModel;
     this.#tripEvents = tripEvents;
     this.#controlsFilters = controlsFilters;
+    this.#filterModel = filterModel;
+    this.#onNewEventClose = onNewEventClose;
+
+    this.#routePointModel.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent);
+
+    this.#ulLstComponent = new UList();
+
+    this.#AddPointPresenter = new AddPointPresenter({
+      container: this.#ulLstComponent,
+      onDataChange: this.#handleViewAction,
+      onNewEventClose: onNewEventClose
+    });
+
   }
+
+  createEvent() {
+    this.#currentSortType = SortType.DAY;
+    this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.Everything);
+    this.#AddPointPresenter.init();
+  }
+
+  #handleViewAction = (actionType, updateType, update) => {
+    switch (actionType) {
+      case UserAction.UPDATE_POINT:
+        this.#routePointModel.updatePoint(updateType, update);
+        break;
+      case UserAction.ADD_POINT:
+        this.#routePointModel.addPoint(updateType, update);
+        break;
+      case UserAction.DELETE_POINT:
+        this.#routePointModel.deletePoint(updateType, update);
+        break;
+    }
+  };
+
+  #handleModelEvent = (updateType, data) => {
+    switch (updateType) {
+      case UpdateType.PATCH:
+        this.#pointsPresenters.get(data.id).init(data);
+        break;
+      case UpdateType.MINOR:
+        this.#clearPage();
+        this.#renderPage();
+        break;
+      case UpdateType.MAJOR:
+        this.#clearPage();
+        this.#renderPage();
+        break;
+    }
+  };
+
+  get points() {
+
+    const filterType = this.#filterModel.filter;
+    const routePoints = this.#routePointModel.points;
+    const filteredPoints = filter[filterType](routePoints);
+
+    switch (this.#currentSortType) {
+      case SortType.DAY:
+        return filteredPoints.sort(sortDay);
+      case SortType.TIME:
+        return filteredPoints.sort(sortTime);
+      case SortType.PRICE:
+        return filteredPoints.sort(sortPrice);
+    }
+    return filteredPoints;
+  }
+
 
   /** запуск отрисовки страницы */
   init() {
 
-    //1. получаем модель данных
-    this.#pointModels = [...this.#routePointModel.getRoutePoints()];
+    this.#renderPage();
 
-    //1.1 сохраняем модель данных в исходном виде
-    this.#sourcedPointModels = [...this.#pointModels];
+  }
 
-    //1.2 получаем массив объектов "название фильтра - массив отфильтрованных точек маршрута"
-    this.#filtredModel = generateFilter(this.#pointModels);
+  #renderPage() {
 
-    //2. рендерим фильтры
-    //2.1 сначала отрендерим форму-обертку для фильтров
-    this.#renderFilterForm();
-
-    for (let i = 0; i < this.#filtredModel.length; i++) {
-      this.#renderFilter(this.#filtredModel[i]);
-    }
-
-    //3. рендерим сортировку
+    //рендерим сортировку
     this.#renderSort();
 
+    //рендерим список
+    this.#renderList();
+  }
+
+  #renderList() {
     //4. рендерим список
     this.#renderUlList();
 
     //5. рендерим элементы списка
     this.#renderPoints();
-
-  }
-
-  /** запуск рендера точек маршрута */
-  #renderPoints() {
-    for (let i = 0; i < this.#pointModels.length; i++) {
-      this.#renderPoint(this.#pointModels[i], this.#ulLstComponent.element);
-    }
   }
 
   /**отрисовка отдельной точки маршрута*/
@@ -82,7 +134,7 @@ export default class PagePresenter {
     const pointPresenter = new PointPresenter(
       {
         ulLstComponentElement: this.#ulLstComponent.element,
-        onDataChange: this.#handlePointClick,
+        onDataChange: this.#handleViewAction,
         onModeChange: this.#handleModeChange
       }
     );
@@ -91,23 +143,17 @@ export default class PagePresenter {
     this.#pointsPresenters.set(point.id, pointPresenter);
   }
 
-
-  /** обработчик события 'клик' для обновления точки маршрута */
-  #handlePointClick = (updatedPoint) => {
-
-    //обновляем текущую модель данных
-    this.#pointModels = updateItem(this.#pointModels, updatedPoint);
-
-    //обновляем исходную модель данных
-    this.#sourcedPointModels = updateItem(this.#sourcedPointModels, updatedPoint);
-
-    //обновляем презентеры точек маршрута
-    this.#pointsPresenters.get(updatedPoint.id).renderPoint(updatedPoint);
-  };
+  /** запуск рендера точек маршрута */
+  #renderPoints() {
+    for (let i = 0; i < this.points.length; i++) {
+      this.#renderPoint(this.points[i], this.#ulLstComponent.element);
+    }
+  }
 
 
   /**обработчик смены режима точки маршрута "редактирование-просмотр"*/
   #handleModeChange = () => {
+    this.#AddPointPresenter.destroy();
     this.#pointsPresenters.forEach((pointPresenter) => pointPresenter.resetView());
   };
 
@@ -121,27 +167,6 @@ export default class PagePresenter {
   }
 
 
-  /** сортировка точек маршрута */
-  #sortPoints(sortType) {
-
-    switch (sortType) {
-      case SortType.DAY:
-        this.#pointModels.sort(sortDay);
-        break;
-      case SortType.TIME:
-        this.#pointModels.sort(sortTime);
-        break;
-      case SortType.PRICE:
-        this.#pointModels.sort(sortPrice);
-        break;
-      default:
-        this.#pointModels = [...this.#sourcedPointModels];
-    }
-
-    this.#currentSortType = sortType;
-  }
-
-
   /**обработчик нажатия на кнопку сортировки */
   #handleSortTypeChange = (sortType) => {
 
@@ -149,50 +174,27 @@ export default class PagePresenter {
       return;
     }
 
-    this.#sortPoints(sortType);
-    this.#clearPointList();
-    this.#renderPoints();
+    this.#currentSortType = sortType;
+    this.#clearPage();
+    this.#renderPage();
 
   };
 
-
-  /**рендер обертки-формы фильтров*/
-  #renderFilterForm() {
-    render(this.#filterFormComponent, this.#controlsFilters);
-  }
-
-  /**отрисовка каждого фильтра*/
-  #renderFilter(filtredModelElement) {
-
-    const renderPage = () => {
-      remove(this.#ulLstComponent);
-      this.#renderUlList();
-      for (let i = 0; i < filtredModelElement.points.length; i++) {
-        this.#renderPoint(filtredModelElement.points[i]);
-      }
-    };
-
-    this.#filterComponent = new Filters({
-      filtredModelElement: filtredModelElement,
-      onFilterClick: () => {
-        renderPage();
-      }
-    });
-    render(this.#filterComponent, this.#filterFormComponent.element);
-  }
-
-
   /**рендер обертки-списка Ul для точек маршрута*/
   #renderUlList() {
-    this.#ulLstComponent = new UList();
     render(this.#ulLstComponent, this.#tripEvents);
   }
 
-
-  /** очистка списка от точек маршрута */
-  #clearPointList() {
+  /**очистка страницы */
+  #clearPage() {
+    this.#AddPointPresenter.destroy();
     this.#pointsPresenters.forEach((pointPresenter) => pointPresenter.destroy());
     this.#pointsPresenters.clear();
+
+    remove(this.#filterComponent);
+    remove(this.#sortComponent);
+    remove(this.#ulLstComponent);
+
   }
 
 }
