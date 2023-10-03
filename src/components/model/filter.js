@@ -1,27 +1,29 @@
 import AbstractView from '../../framework/view/abstract-view.js';
-import { createFilters } from '../../components/view/filter.js';
+import { createFilters } from '../view/filter.js';
 
 export default class Filters extends AbstractView {
 
-  #filtredModelElement = null;
-  #handleClick = null;
+  #filtredModel = null;
+  #onHandleClick = null;
+  #currentFilter = null;
 
-  constructor({filtredModelElement, onFilterClick}){
+  constructor({filtredModel,currentFilterType, onFilterTypeChange}){
     super();
 
-    this.#filtredModelElement = filtredModelElement;
-    this.#handleClick = onFilterClick;
+    this.#filtredModel = filtredModel;
+    this.#currentFilter = currentFilterType;
+    this.#onHandleClick = onFilterTypeChange;
 
-    this.element.querySelector(`#filter-${filtredModelElement.type}`).addEventListener('click',this.#clickHandler);
+    this.element.addEventListener('change',this.#clickHandler);
   }
 
   get template() {
-    return createFilters(this.#filtredModelElement);
+    return createFilters(this.#filtredModel);
   }
 
   #clickHandler = (evt) =>{
     evt.preventDefault();
-    this.#handleClick();
+    this.#onHandleClick(evt.target.value);
   };
 
 }

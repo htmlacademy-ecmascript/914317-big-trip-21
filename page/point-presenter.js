@@ -1,6 +1,7 @@
 import { render, replace, remove } from '../src/framework/render.js';
 import PointItself from '../src/components/model/point-Itself.js';
 import EditPoint from '../src/components/model/edit-point.js';
+import {UserAction, UpdateType} from '../src/const.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -32,7 +33,10 @@ export default class PointPresenter {
 
   /** обработчик события 'клик' для поля "Избранное" */
   #onFavouriteClickHandle = () => {
-    this.#onDataChange({ ...this.#pointModel, isFavourite: !this.#pointModel.isFavourite });
+    this.#onDataChange(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
+      { ...this.#pointModel, isFavourite: !this.#pointModel.isFavourite });
   };
 
   /** закрыть все открытые для редактирования точки */
@@ -96,8 +100,13 @@ export default class PointPresenter {
 
   }
 
+  /**обработчик кнопки "Save"*/
   #handleFormSubmit = (point) =>{
-    this.#onDataChange(point);
+    this.#onDataChange(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
+      point
+    );
     this.#replaceEditToPoint();
   };
 
