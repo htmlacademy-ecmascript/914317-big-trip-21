@@ -4,9 +4,11 @@ import { createSort } from '../../components/view/sort.js';
 export default class Sort extends AbstractView {
 
   #handleSortTypeChange = null;
+  #currentSortType = null;
 
-  constructor({onSortTypeChange}){
+  constructor({currentSortType,onSortTypeChange}){
     super();
+    this.#currentSortType = currentSortType;
     this.#handleSortTypeChange = onSortTypeChange;
 
     this.element.addEventListener('click',this.#sortTypeChangeHandler);
@@ -22,6 +24,6 @@ export default class Sort extends AbstractView {
   };
 
   get template() {
-    return createSort();
+    return createSort(this.#currentSortType);
   }
 }

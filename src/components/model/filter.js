@@ -18,7 +18,7 @@ export default class Filters extends AbstractView {
   }
 
   get template() {
-    return createFilters(this.#filtredModel);
+    return createFilters(this.#filtredModel,this.#currentFilter);
   }
 
   #clickHandler = (evt) =>{

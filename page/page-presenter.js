@@ -5,8 +5,8 @@ import Sort from '../src/components/model/sort.js';
 import UList from '../src/components/model/add-list.js';
 import PointPresenter from '../page/point-presenter.js';
 import AddPointPresenter from '../page/add-point-presenter.js';
-import {filter} from '../src/utils/filter.js';
-
+import { filter } from '../src/utils/filter.js';
+//import LoadingView from '../view/loading-view.js';
 export default class PagePresenter {
 
   //модели данных
@@ -21,6 +21,7 @@ export default class PagePresenter {
   #filterComponent = null;
   #sortComponent = null;
   #ulLstComponent = null;
+  //#loadingComponent = new LoadingView();
 
   //презентеры
   #pointsPresenters = new Map();
@@ -29,8 +30,9 @@ export default class PagePresenter {
   //служебное
   #currentSortType = SortType.DAY;
   #onNewEventClose = null;
+  #isLoading = true;
 
-  constructor({ pointModel, controlsFilters, tripEvents, filterModel,onNewEventClose }) {
+  constructor({ pointModel, controlsFilters, tripEvents, filterModel, onNewEventClose }) {
     this.#routePointModel = pointModel;
     this.#tripEvents = tripEvents;
     this.#controlsFilters = controlsFilters;
@@ -76,10 +78,16 @@ export default class PagePresenter {
         this.#pointsPresenters.get(data.id).init(data);
         break;
       case UpdateType.MINOR:
+        this.#clearPageMinor();
+        this.#renderPageMinor();
+        break;
+      case UpdateType.MAJOR:
         this.#clearPage();
         this.#renderPage();
         break;
-      case UpdateType.MAJOR:
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        //remove(this.#loadingComponent);
         this.#clearPage();
         this.#renderPage();
         break;
@@ -109,6 +117,12 @@ export default class PagePresenter {
 
     this.#renderPage();
 
+  }
+
+  #renderPageMinor() {
+
+    //рендерим список
+    this.#renderList();
   }
 
   #renderPage() {
@@ -161,6 +175,7 @@ export default class PagePresenter {
   /**рендер компонента сортировки*/
   #renderSort() {
     this.#sortComponent = new Sort({
+      currentSortType: this.#currentSortType,
       onSortTypeChange: this.#handleSortTypeChange
     });
     render(this.#sortComponent, this.#tripEvents);
@@ -175,8 +190,8 @@ export default class PagePresenter {
     }
 
     this.#currentSortType = sortType;
-    this.#clearPage();
-    this.#renderPage();
+    this.#clearPageMinor();
+    this.#renderPageMinor();
 
   };
 
@@ -193,6 +208,16 @@ export default class PagePresenter {
 
     remove(this.#filterComponent);
     remove(this.#sortComponent);
+    remove(this.#ulLstComponent);
+
+    this.#currentSortType = SortType.DAY;
+  }
+
+  #clearPageMinor() {
+    this.#AddPointPresenter.destroy();
+    this.#pointsPresenters.forEach((pointPresenter) => pointPresenter.destroy());
+    this.#pointsPresenters.clear();
+
     remove(this.#ulLstComponent);
 
   }

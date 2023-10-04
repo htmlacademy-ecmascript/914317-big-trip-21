@@ -1,14 +1,20 @@
-import {formatDate} from '../../utils/util.js';
-import he from 'he';
+import { formatDate } from '../../utils/util.js';
+//import he from 'he';
 
-function editPoint({eventType,destination,price,startTime,endTime,offers}){
+function editPoint({ eventType, destination, price, startTime, endTime, offers, availiableOffers, availiableDestinations }) {
 
-  const destinationName = destination.name;
-  const destinationDescription = destination.description;
+  const destinationInfo = findDestination(destination, availiableDestinations)[0];
+
+  const destinationName = destinationInfo.name;
+  const destinationDescription = destinationInfo.description;
+
+  const offersMarkup = createOffers(eventType, offers, availiableOffers);
+
+  const destinationDatalist = fillDestinationDatalist(availiableDestinations);
 
   const formatDateString = 'DD/MM/YYYY HH:MM';
-  const formattedStartDate = formatDate(startTime,formatDateString);
-  const formattedEndDate = formatDate(endTime,formatDateString);
+  const formattedStartDate = formatDate(startTime, formatDateString);
+  const formattedEndDate = formatDate(endTime, formatDateString);
 
   return `<form class="event event--edit" action="#" method="post">
             <header class="event__header">
@@ -77,9 +83,7 @@ function editPoint({eventType,destination,price,startTime,endTime,offers}){
                 </label>
                 <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destinationName}" list="destination-list-1">
                 <datalist id="destination-list-1">
-                  <option value="Amsterdam"></option>
-                  <option value="Geneva"></option>
-                  <option value="Chamonix"></option>
+                 ${destinationDatalist}
                 </datalist>
               </div>
 
@@ -96,7 +100,7 @@ function editPoint({eventType,destination,price,startTime,endTime,offers}){
                   <span class="visually-hidden">Price</span>
                   &euro;
                 </label>
-                <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${he.encode(price)}">
+                <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
               </div>
 
               <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -106,36 +110,59 @@ function editPoint({eventType,destination,price,startTime,endTime,offers}){
               </button>
             </header>
             <section class="event__details">
-              <section class="event__section  event__section--offers">
-                <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-
-                <div class="event__available-offers">
-                ${createOffers(offers.get(eventType))}
-                </div>
-              </section>
-
-              <section class="event__section  event__section--destination">
-                <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-                <p class="event__destination-description">${destinationDescription}</p>
-              </section>
+                ${offersMarkup}
+                ${destinationDescription !== '' ? `
+                <section class="event__section  event__section--destination">
+                    <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+                    <p class="event__destination-description">${destinationDescription}</p>
+                  </section>` : ''}
             </section>
           </form>
   `;
 }
 
-function createOffers(offers) {
+function fillDestinationDatalist(availiableDestinations){
+  return availiableDestinations.map(({ name, id }) =>
+    `<option value="${name}" data-dest-id = "${id}"></option>`).join('');
+}
 
-  return (
-    offers.map(({ name, price, id }) =>
-      `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${id}-1" type="checkbox" name="event-offer-${id}" checked>
-        <label class="event__offer-label" for="event-offer-${id}-1">
-          <span class="event__offer-title">${name}</span>
-          &plus;&euro;&nbsp;
-          <span class="event__offer-price">${price}</span>
-        </label>
-      </div>`
-    ).join(''));
+function findDestination(currenDestination, availiableDestinations) {
+  return availiableDestinations.filter((item) => item.id === currenDestination);
+}
+
+function createOffers(eventType, offers, availaibleOffers) {
+  let neededOffers = null;
+  const filtredTypeOffers = availaibleOffers.filter((item) => item.type === eventType);
+
+  const currentOffers = filtredTypeOffers[0].offers.filter((item) => offers.includes(item.id));
+
+  if (currentOffers.length === 0) {
+    neededOffers = filtredTypeOffers[0].offers;
+  } else {
+    neededOffers = currentOffers;
+  }
+  if (neededOffers.length === 0) {
+    return '';
+  } else {
+    return (
+      `<section class="event__section  event__section--offers">
+          <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+
+          <div class="event__available-offers">
+          ${neededOffers.map(({ name, price, id }) =>
+        `<div class="event__offer-selector">
+            <input class="event__offer-checkbox  visually-hidden" id="event-offer-${id}-1" type="checkbox" name="event-offer-${id}" checked>
+            <label class="event__offer-label" for="event-offer-${id}-1">
+              <span class="event__offer-title">${name}</span>
+              &plus;&euro;&nbsp;
+              <span class="event__offer-price">${price}</span>
+            </label>
+          </div>`
+      ).join('')}
+          </div>
+      </section>`);
+  }
+
 }
 
 
