@@ -4,14 +4,20 @@ import RoutePointModel from '../src/model/route-point-model.js';
 import FilterModel from '../src/model/filter-model.js';
 import FilterPresenter from '../page/filter-presenter.js';
 import NewEventBtn from '../src/components/model/new-event-btn-model.js';
+import PointsApiService from './points-api-service.js';
 
+const AUTHORIZATION = 'Basic hS791S44wcl20a2j';
+const END_POINT = 'https://21.objects.pages.academy/big-trip';
 
 const controlsFilters = document.querySelector('.trip-controls__filters');
 
 const tripEvents = document.querySelector('.trip-events');
 const tripMain = document.querySelector('.trip-main');
 
-const routePointModel = new RoutePointModel();
+const routePointModel = new RoutePointModel({
+  pointsApiService: new PointsApiService(END_POINT, AUTHORIZATION)
+});
+
 const filterModel = new FilterModel();
 
 const filterPresenter = new FilterPresenter({
@@ -41,6 +47,10 @@ function newEventBtnClick(){
   newEventBtnComponent.element.disabled = true;
 }
 
-render(newEventBtnComponent,tripMain);
 filterPresenter.init();
 pagePresenter.init();
+routePointModel.init().finally(
+  () => {
+    render(newEventBtnComponent,tripMain);
+  }
+);

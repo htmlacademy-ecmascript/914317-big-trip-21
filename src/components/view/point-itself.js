@@ -1,10 +1,12 @@
-import {formatDate,formatDuration} from '../../utils/util.js';
+import { formatDate, formatDuration } from '../../utils/util.js';
 
-function createPointItself({eventType, destination, price, offers, startTime, endTime, isFavourite}) {
+function createPointItself({ eventType, destination, price, offers, startTime, endTime, isFavourite, availiableOffers, availiableDestinations }) {
 
-  const offersMarkup = createOffers(offers.get(eventType));
+  const offersMarkup = createOffers(eventType, offers, availiableOffers);
 
-  const destinationName = destination.name;
+  const destinationInfo = findDestination(destination, availiableDestinations);
+
+  const destinationName = destinationInfo[0].name;
 
   const eventDate = formatDate(startTime, 'MMM DD');
   const eventDateMarkup = formatDate(startTime, 'YYYY-MM-DD');
@@ -35,10 +37,7 @@ function createPointItself({eventType, destination, price, offers, startTime, en
               <p class="event__price">
                 &euro;&nbsp;<span class="event__price-value">${price}</span>
               </p>
-              <h4 class="visually-hidden">Offers:</h4>
-              <ul class="event__selected-offers">
                 ${offersMarkup}
-              </ul>
               <button class="event__favorite-btn ${isFavourite === true ? 'event__favorite-btn--active' : ''}" type="button">
                 <span class="visually-hidden">Add to favorite</span>
                 <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
@@ -53,16 +52,43 @@ function createPointItself({eventType, destination, price, offers, startTime, en
   `;
 }
 
-function createOffers(offers) {
+function findDestination(currenDestination, availiableDestinations) {
+  return availiableDestinations.filter((item) => item.id === currenDestination);
+}
 
-  return (
-    offers.map(({ name, price }) =>
-      `<li class="event__offer">
-        <span class="event__offer-title">${name}</span>
-        &plus;&euro;&nbsp;
-        <span class="event__offer-price">${price}</span>
-      </li>`
-    ).join(''));
+function createOffers(eventType, offers, availiableOffers) {
+
+  let neededOffers = [];
+
+  const filtredTypeOffers = availiableOffers.filter((item) => item.type === eventType);
+
+  const currentOffers = filtredTypeOffers[0].offers.filter((item) => offers.includes(item.id));
+
+  if (currentOffers.length === 0) {
+    neededOffers = filtredTypeOffers[0].offers;
+  } else {
+    neededOffers = currentOffers;
+  }
+
+
+  if (neededOffers.length === 0) {
+    return '';
+  } else {
+    return (
+      `<h4 class="visually-hidden">Offers:</h4>
+      <ul class="event__selected-offers">
+           ${neededOffers.map(({ name, price }) =>
+        `<li class="event__offer">
+          <span class="event__offer-title">${name}</span>
+          &plus;&euro;&nbsp;
+          <span class="event__offer-price">${price}</span>
+        </li>`
+      ).join('')
+      }
+      </ul>`
+    );
+  }
+
 }
 
 
