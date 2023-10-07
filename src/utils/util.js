@@ -95,4 +95,14 @@ function sortPrice(pointA, pointB) {
   return compareNumeric(pointA.price, pointB.price);
 }
 
-export { sortDay, sortTime, sortPrice, getRandomArrayElement, formatDate, formatDuration, isDatePast, isDateFuture, isDatePresent, updateItem };
+function findNeededOffers(eventType, offers, availableOffers){
+
+  const filtredTypeOffers = availableOffers.filter((item) => item.type === eventType);
+  const neededType = filtredTypeOffers[0];
+  const currentOffers = neededType.offers.filter((item) => offers.includes(item.id));
+
+  return currentOffers.length === 0 ? neededType.offers : currentOffers;
+
+}
+
+export { findNeededOffers, sortDay, sortTime, sortPrice, getRandomArrayElement, formatDate, formatDuration, isDatePast, isDateFuture, isDatePresent, updateItem };

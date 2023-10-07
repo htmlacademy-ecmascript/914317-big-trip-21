@@ -24,8 +24,8 @@ export default class RoutePointModel extends Observable {
       this.#destinations = destinationsFromApi;
 
       this.#routePoints.map((item) => {
-        item['availiableOffers'] = this.#offers;
-        item['availiableDestinations'] = this.#destinations;
+        item['availableOffers'] = this.#offers;
+        item['availableDestinations'] = this.#destinations;
       });
 
 

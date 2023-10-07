@@ -1,5 +1,5 @@
-import AddNewPoint from '../src/components/model/add-new-point.js';
-import { remove, render, RenderPosition } from '../src/framework/render.js';
+import AddNewPoint from '../components/model/add-new-point.js';
+import { remove, render, RenderPosition } from '../framework/render.js';
 // import {nanoid} from 'nanoid';
 
 

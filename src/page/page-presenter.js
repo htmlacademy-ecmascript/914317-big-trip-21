@@ -1,11 +1,11 @@
-import { render, remove } from '../src/framework/render.js';
-import { sortDay, sortTime, sortPrice } from '../src/utils/util.js';
-import { SortType, FilterType, UserAction, UpdateType } from '../src/const.js';
-import Sort from '../src/components/model/sort.js';
-import UList from '../src/components/model/add-list.js';
+import { render, remove } from '../framework/render.js';
+import { sortDay, sortTime, sortPrice } from '../utils/util.js';
+import { SortType, FilterType, UserAction, UpdateType } from '../const.js';
+import Sort from '../components/model/sort.js';
+import UList from '../components/model/add-list.js';
 import PointPresenter from '../page/point-presenter.js';
 import AddPointPresenter from '../page/add-point-presenter.js';
-import { filter } from '../src/utils/filter.js';
+import { filter } from '../utils/filter.js';
 //import LoadingView from '../view/loading-view.js';
 export default class PagePresenter {
 
