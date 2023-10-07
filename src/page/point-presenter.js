@@ -1,7 +1,7 @@
-import { render, replace, remove } from '../src/framework/render.js';
-import PointItself from '../src/components/model/point-Itself.js';
-import EditPoint from '../src/components/model/edit-point.js';
-import {UserAction, UpdateType} from '../src/const.js';
+import { render, replace, remove } from '../framework/render.js';
+import PointItself from '../components/model/point-Itself.js';
+import EditPoint from '../components/model/edit-point.js';
+import {UserAction, UpdateType} from '../const.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',

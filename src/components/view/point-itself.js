@@ -1,10 +1,10 @@
-import { formatDate, formatDuration } from '../../utils/util.js';
+import { formatDate, formatDuration,findNeededOffers } from '../../utils/util.js';
 
-function createPointItself({ eventType, destination, price, offers, startTime, endTime, isFavourite, availiableOffers, availiableDestinations }) {
+function createPointItself({ eventType, destination, price, offers, startTime, endTime, isFavourite, availableOffers, availableDestinations }) {
 
-  const offersMarkup = createOffers(eventType, offers, availiableOffers);
+  const offersMarkup = createOffers(eventType, offers, availableOffers);
 
-  const destinationInfo = findDestination(destination, availiableDestinations);
+  const destinationInfo = findDestination(destination, availableDestinations);
 
   const destinationName = destinationInfo[0].name;
 
@@ -52,42 +52,29 @@ function createPointItself({ eventType, destination, price, offers, startTime, e
   `;
 }
 
-function findDestination(currenDestination, availiableDestinations) {
-  return availiableDestinations.filter((item) => item.id === currenDestination);
+function findDestination(currenDestination, availableDestinations) {
+  return availableDestinations.filter((item) => item.id === currenDestination);
 }
 
-function createOffers(eventType, offers, availiableOffers) {
+function createOffers(eventType, offers, availableOffers) {
 
-  let neededOffers = [];
+  let finalMarkup = '';
 
-  const filtredTypeOffers = availiableOffers.filter((item) => item.type === eventType);
+  const neededOffers = findNeededOffers(eventType, offers, availableOffers);
 
-  const currentOffers = filtredTypeOffers[0].offers.filter((item) => offers.includes(item.id));
-
-  if (currentOffers.length === 0) {
-    neededOffers = filtredTypeOffers[0].offers;
-  } else {
-    neededOffers = currentOffers;
-  }
-
-
-  if (neededOffers.length === 0) {
-    return '';
-  } else {
-    return (
+  if (neededOffers.length > 0) {
+    finalMarkup =
       `<h4 class="visually-hidden">Offers:</h4>
       <ul class="event__selected-offers">
            ${neededOffers.map(({ name, price }) =>
-        `<li class="event__offer">
+    `<li class="event__offer">
           <span class="event__offer-title">${name}</span>
           &plus;&euro;&nbsp;
           <span class="event__offer-price">${price}</span>
-        </li>`
-      ).join('')
-      }
-      </ul>`
-    );
+        </li>`).join('')}</ul>`;
   }
+
+  return finalMarkup;
 
 }
 

@@ -1,8 +1,8 @@
 import {render} from '../src/framework/render.js';
-import PagePresenter from '../page/page-presenter.js';
+import PagePresenter from '../src/page/page-presenter.js';
 import RoutePointModel from '../src/model/route-point-model.js';
 import FilterModel from '../src/model/filter-model.js';
-import FilterPresenter from '../page/filter-presenter.js';
+import FilterPresenter from '../src/page/filter-presenter.js';
 import NewEventBtn from '../src/components/model/new-event-btn-model.js';
 import PointsApiService from './points-api-service.js';
 
