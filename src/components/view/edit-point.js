@@ -1,5 +1,4 @@
-import { formatDate, findNeededOffers } from '../../utils/util.js';
-//import he from 'he';
+import { formatDate, findNeededOffers,fillDestinationDatalist } from '../../utils/util.js';
 
 function editPoint({ eventType, destination, price, startTime, endTime, offers, availableOffers, availableDestinations }) {
 
@@ -111,11 +110,6 @@ function editPoint({ eventType, destination, price, startTime, endTime, offers, 
             ${descriptionSection}
           </form>
   `;
-}
-
-function fillDestinationDatalist(availableDestinations) {
-  return availableDestinations.map(({ name, id }) =>
-    `<option value="${name}" data-id = "${id}" class = "datalistItem"></option>`).join('');
 }
 
 function createDescriptionSection(destinationInfo, offersMarkup) {

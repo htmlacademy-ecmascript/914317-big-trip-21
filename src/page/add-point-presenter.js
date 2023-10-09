@@ -1,15 +1,15 @@
 import AddNewPoint from '../components/model/add-new-point.js';
 import { remove, render, RenderPosition } from '../framework/render.js';
-// import {nanoid} from 'nanoid';
-
 
 export default class AddPointPresenter {
   #container = null;
   #onDataChange = null;
   #onNewEventClose = null;
   #newEventComponent = null;
+  #routePointModel = null;
 
-  constructor({container, onDataChange, onNewEventClose}) {
+  constructor({routePointModel, container, onDataChange, onNewEventClose}) {
+    this.#routePointModel = routePointModel;
     this.#container = container;
     this.#onDataChange = onDataChange;
     this.#onNewEventClose = onNewEventClose;
@@ -20,7 +20,11 @@ export default class AddPointPresenter {
       return;
     }
 
-    this.#newEventComponent = new AddNewPoint();
+    this.#newEventComponent = new AddNewPoint(
+      {
+        pointModel: this.#routePointModel
+      }
+    );
     render(this.#newEventComponent, this.#container.element, RenderPosition.AFTERBEGIN);
 
     document.addEventListener('keydown', this.#escKeyDownHandler);
@@ -33,19 +37,6 @@ export default class AddPointPresenter {
       this.destroy();
     }
   };
-
-  // #handleFormSubmit = (task) => {
-  //   this.#handleDataChange(
-  //     UserAction.ADD_TASK,
-  //     UpdateType.MINOR,
-  //     {id: nanoid(), ...task},
-  //   );
-  //   this.destroy();
-  // };
-
-  // #handleDeleteClick = () => {
-  //   this.destroy();
-  // };
 
   destroy(){
     if(this.#newEventComponent === null){

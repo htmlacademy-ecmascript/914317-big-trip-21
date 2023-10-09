@@ -107,4 +107,9 @@ function findNeededOffers(eventType, offers, availableOffers){
   return finalOffers.offers;
 }
 
-export { findNeededOffers, sortDay, sortTime, sortPrice, getRandomArrayElement, formatDate, formatDuration, isDatePast, isDateFuture, isDatePresent, updateItem };
+function fillDestinationDatalist(availableDestinations) {
+  return availableDestinations.map(({ name, id }) =>
+    `<option value="${name}" data-id = "${id}" class = "datalistItem"></option>`).join('');
+}
+
+export { fillDestinationDatalist, findNeededOffers, sortDay, sortTime, sortPrice, getRandomArrayElement, formatDate, formatDuration, isDatePast, isDateFuture, isDatePresent, updateItem };

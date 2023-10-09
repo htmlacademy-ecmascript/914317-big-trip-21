@@ -72,6 +72,14 @@ export default class RoutePointModel extends Observable {
     return this.#routePoints;
   }
 
+  get offers() {
+    return this.#offers;
+  }
+
+  get destinations() {
+    return this.#destinations;
+  }
+
   async updatePoint(updateType, update) {
     const index = this.#routePoints.findIndex((task) => task.id === update.id);
 
