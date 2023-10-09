@@ -1,4 +1,4 @@
-import { formatDate,findNeededOffers } from '../../utils/util.js';
+import { formatDate, findNeededOffers } from '../../utils/util.js';
 //import he from 'he';
 
 function editPoint({ eventType, destination, price, startTime, endTime, offers, availableOffers, availableDestinations }) {
@@ -6,9 +6,8 @@ function editPoint({ eventType, destination, price, startTime, endTime, offers, 
   const destinationInfo = findDestination(destination, availableDestinations)[0];
 
   const destinationName = destinationInfo.name;
-  const destinationDescription = destinationInfo.description;
-
   const offersMarkup = createOffers(eventType, offers, availableOffers);
+  const descriptionSection = createDescriptionSection(destinationInfo, offersMarkup);
 
   const destinationDatalist = fillDestinationDatalist(availableDestinations);
 
@@ -109,25 +108,60 @@ function editPoint({ eventType, destination, price, startTime, endTime, offers, 
                 <span class="visually-hidden">Open event</span>
               </button>
             </header>
-            <section class="event__details">
-                ${offersMarkup}
-                ${destinationDescription !== '' ? `
-                <section class="event__section  event__section--destination">
-                    <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-                    <p class="event__destination-description">${destinationDescription}</p>
-                  </section>` : ''}
-            </section>
+            ${descriptionSection}
           </form>
   `;
 }
 
-function fillDestinationDatalist(availableDestinations){
+function fillDestinationDatalist(availableDestinations) {
   return availableDestinations.map(({ name, id }) =>
-    `<option value="${name}" data-dest-id = "${id}"></option>`).join('');
+    `<option value="${name}" data-id = "${id}" class = "datalistItem"></option>`).join('');
+}
+
+function createDescriptionSection(destinationInfo, offersMarkup) {
+
+  const destinationDescription = destinationInfo.description;
+  const photoMarkup = createPhotoMarkup(destinationInfo.pictures);
+
+  let finalMarkup = '';
+
+  if (offersMarkup !== '') {
+    finalMarkup = finalMarkup + offersMarkup;
+  }
+
+  if (destinationDescription !== '') {
+    finalMarkup = `${finalMarkup}<h3 class="event__section-title  event__section-title--destination">Destination</h3><p class="event__destination-description">${destinationDescription}</p>`;
+  }
+
+  if (photoMarkup !== '') {
+    finalMarkup = finalMarkup + photoMarkup;
+  }
+
+  if (finalMarkup !== '') {
+    finalMarkup = `<section class="event__details"> ${finalMarkup}</section>`;
+  }
+
+  return finalMarkup;
 }
 
 function findDestination(currenDestination, availableDestinations) {
   return availableDestinations.filter((item) => item.id === currenDestination);
+}
+
+function createPhotoMarkup(photos) {
+
+  let photoMarkup = '';
+
+
+  if (photos.length > 0) {
+    photoMarkup = `<div class="event__photos-container">
+    <div class="event__photos-tape">
+      ${photos.map(({ description, src }) => `<img class="event__photo" src="${src}" alt="${description}">`).join('')}</div>
+    </div>`;
+  }
+
+  return photoMarkup;
+
 }
 
 function createOffers(eventType, offers, availableOffers) {
@@ -136,19 +170,20 @@ function createOffers(eventType, offers, availableOffers) {
 
   const neededOffers = findNeededOffers(eventType, offers, availableOffers);
 
-  if (neededOffers.length > 0) {
-    finalMarkup = `<section class="event__section  event__section--offers">
-          <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-          <div class="event__available-offers">
-          ${neededOffers.map(({ name, price, id }) =>
+  finalMarkup = `${neededOffers.map(({ name, price, id, checked }) =>
     `<div class="event__offer-selector">
-            <input class="event__offer-checkbox  visually-hidden" id="event-offer-${id}-1" type="checkbox" name="event-offer-${id}" checked>
+            <input class="event__offer-checkbox  visually-hidden" id="event-offer-${id}-1" type="checkbox" data-id = "${id}" name="event-offer-${id}" ${checked === true ? 'checked' : ''}>
             <label class="event__offer-label" for="event-offer-${id}-1">
               <span class="event__offer-title">${name}</span>
               &plus;&euro;&nbsp;
               <span class="event__offer-price">${price}</span>
             </label>
-          </div>`).join('')}</div></section>`;
+          </div>`).join('')}`;
+
+  if (finalMarkup !== '') {
+    finalMarkup = `<section class="event__section  event__section--offers">
+    <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+    <div class="event__available-offers">${finalMarkup}</div></section>`;
   }
 
   return finalMarkup;

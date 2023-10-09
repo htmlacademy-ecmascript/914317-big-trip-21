@@ -75,19 +75,19 @@ function sortDay(pointA, pointB) {
 
 function sortTime(pointA, pointB) {
 
-  return dayjs(pointB.startTime).diff(dayjs(pointA.startTime), 'hour');
+  // return dayjs(pointA.startTime).diff(dayjs(pointA.endTime)) - dayjs(pointB.startTime).diff(dayjs(pointB.endTime));
+  return differTimes(pointA) - differTimes(pointB);
+
+}
+
+function differTimes(point){
+  return dayjs(point.startTime).diff(dayjs(point.endTime));
 }
 
 function compareNumeric(a, b) {
-  if (a > b) {
-    return 1;
-  }
-  if (a === b) {
-    return 0;
-  }
-  if (a < b) {
-    return -1;
-  }
+
+  return b - a;
+
 }
 
 function sortPrice(pointA, pointB) {
@@ -98,11 +98,13 @@ function sortPrice(pointA, pointB) {
 function findNeededOffers(eventType, offers, availableOffers){
 
   const filtredTypeOffers = availableOffers.filter((item) => item.type === eventType);
-  const neededType = filtredTypeOffers[0];
-  const currentOffers = neededType.offers.filter((item) => offers.includes(item.id));
+  const finalOffers = filtredTypeOffers[0];
 
-  return currentOffers.length === 0 ? neededType.offers : currentOffers;
+  finalOffers.offers.map((item) => {
+    item['checked'] = offers.includes(item.id);
+  });
 
+  return finalOffers.offers;
 }
 
 export { findNeededOffers, sortDay, sortTime, sortPrice, getRandomArrayElement, formatDate, formatDuration, isDatePast, isDateFuture, isDatePresent, updateItem };
