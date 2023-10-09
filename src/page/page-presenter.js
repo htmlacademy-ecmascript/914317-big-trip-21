@@ -21,7 +21,6 @@ export default class PagePresenter {
   #filterComponent = null;
   #sortComponent = null;
   #ulLstComponent = null;
-  //#loadingComponent = new LoadingView();
 
   //презентеры
   #pointsPresenters = new Map();
@@ -45,6 +44,7 @@ export default class PagePresenter {
     this.#ulLstComponent = new UList();
 
     this.#AddPointPresenter = new AddPointPresenter({
+      routePointModel: this.#routePointModel,
       container: this.#ulLstComponent,
       onDataChange: this.#handleViewAction,
       onNewEventClose: onNewEventClose
@@ -87,7 +87,6 @@ export default class PagePresenter {
         break;
       case UpdateType.INIT:
         this.#isLoading = false;
-        //remove(this.#loadingComponent);
         this.#clearPage();
         this.#renderPage();
         break;

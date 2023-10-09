@@ -1,4 +1,9 @@
-function addNewPoint(){
+import { fillDestinationDatalist } from '../../utils/util.js';
+
+function addNewPoint(destinations){
+
+  const destinationDatalist = fillDestinationDatalist(destinations);
+
   return `<li class="trip-events__item">
             <form class="event event--edit" action="#" method="post">
               <header class="event__header">
@@ -67,9 +72,7 @@ function addNewPoint(){
                   </label>
                   <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="Geneva" list="destination-list-1">
                   <datalist id="destination-list-1">
-                    <option value="Amsterdam"></option>
-                    <option value="Geneva"></option>
-                    <option value="Chamonix"></option>
+                  ${destinationDatalist}
                   </datalist>
                 </div>
 
