@@ -59,19 +59,18 @@ function findDestination(currenDestination, availableDestinations) {
 function createOffers(eventType, offers, availableOffers) {
 
   let finalMarkup = '';
-
   const neededOffers = findNeededOffers(eventType, offers, availableOffers);
 
-  if (neededOffers.length > 0) {
-    finalMarkup =
-      `<h4 class="visually-hidden">Offers:</h4>
-      <ul class="event__selected-offers">
-           ${neededOffers.map(({ name, price }) =>
-    `<li class="event__offer">
+  finalMarkup =
+`${neededOffers.map(({ name, price }) =>
+  `<li class="event__offer">
           <span class="event__offer-title">${name}</span>
           &plus;&euro;&nbsp;
           <span class="event__offer-price">${price}</span>
-        </li>`).join('')}</ul>`;
+        </li>`).join('')}`;
+
+  if (finalMarkup !== ''){
+    finalMarkup = `<h4 class="visually-hidden">Offers:</h4><ul class="event__selected-offers">${finalMarkup}</ul>`;
   }
 
   return finalMarkup;

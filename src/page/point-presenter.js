@@ -79,7 +79,8 @@ export default class PointPresenter {
         this.#replaceEditToPoint();
         document.removeEventListener('keydown', escKeyDownHandler);
       },
-      onFormSubmit: this.#handleFormSubmit
+      onFormSubmit: this.#handleFormSubmit,
+      onFormDelete: this.#handleFormDelete
     });
 
     if (prevPointComponent === null || prevEditPointComponent === null) {
@@ -108,6 +109,15 @@ export default class PointPresenter {
       point
     );
     this.#replaceEditToPoint();
+  };
+
+  #handleFormDelete = (point) => {
+    this.#onDataChange(
+      UserAction.DELETE_POINT,
+      UpdateType.MINOR,
+      point
+    );
+    //this.#replaceEditToPoint();
   };
 
   /**смена точки маршрута на форму редактирования*/

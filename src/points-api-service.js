@@ -3,6 +3,7 @@ import ApiService from './framework/api-service.js';
 const Method = {
   GET: 'GET',
   PUT: 'PUT',
+  DELETE: 'DELETE'
 };
 
 export default class PointsApiService extends ApiService {
@@ -32,6 +33,18 @@ export default class PointsApiService extends ApiService {
     const parsedResponse = await ApiService.parseResponse(response);
 
     return parsedResponse;
+  }
+
+
+  async deletePoint(point) {
+
+    const response = await this._load({
+      url: `points/${point.id}`,
+      method: Method.DELETE,
+    });
+
+    return response;
+
   }
 
   #adaptPointsToServer(point) {

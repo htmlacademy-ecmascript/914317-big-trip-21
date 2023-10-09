@@ -99,19 +99,24 @@ export default class RoutePointModel extends Observable {
     this._notify(updateType, update);
   }
 
-  deletePoint(updateType, update) {
+  async deletePoint(updateType, update) {
     const index = this.#routePoints.findIndex((task) => task.id === update.id);
 
     if (index === -1) {
       throw new Error('Can\'t delete unexisting point');
     }
 
-    this.#routePoints = [
-      ...this.#routePoints.slice(0, index),
-      ...this.#routePoints.slice(index + 1),
-    ];
+    try {
+      await this.#pointsApiService.deletePoint(update);
+      this.#routePoints = [
+        ...this.#routePoints.slice(0, index),
+        ...this.#routePoints.slice(index + 1),
+      ];
+      this._notify(updateType);
+    } catch(err) {
+      throw new Error('Can\'t delete task');
+    }
 
-    this._notify(updateType);
   }
 
 }
